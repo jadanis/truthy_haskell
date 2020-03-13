@@ -123,7 +123,7 @@ cases_ keys =
     ((t,f):rs) -> (case_ t f):(cases_ rs)
 
 cases_pure_ :: (Truthy a) => [(x -> a, b)] -> [x -> Maybe b]
-cases_pure_ keys = cases_ [ (t,(\_ -> b)) | (t,b) <- keys ]
+cases_pure_ keys = cases_ [ (t, const b) | (t,b) <- keys ]
 
 breaks_ :: (Truthy a) => [x -> a] -> [b] -> [x -> Maybe b]
 breaks_ tests res = cases_pure_ $ zip tests res
@@ -134,4 +134,4 @@ example_ x =
   switch_ x mycases default_ bummer
   where
     mycases = breaks_ [(>= 100), (>= 50), (>= 25), (>= 10)] ["Woo hoo!", "Nice!", "Getting there", "Not quite"]
-    bummer = (\_ -> "Bummer")
+    bummer = const "Bummer"
