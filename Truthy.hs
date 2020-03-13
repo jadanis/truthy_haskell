@@ -21,55 +21,37 @@ module Truthy
 where
 
 class Truthy a where
-  if_ :: a -> (x -> b) -> x -> (y -> b) -> y -> b
   not_ :: a -> Bool
 
 instance Truthy Bool where
-  if_ False f r1 g r2 = g r2
-  if_ True f r1 g r2 = f r1
   not_ = not
 
 instance Truthy Int where
-  if_ 0 = if_ False
-  if_ _ = if_ True
   not_ 0 = True
   not_ _ = False
  
 instance Truthy Float where
-  if_ 0 = if_ False
-  if_ _ = if_ True
   not_ 0 = True
   not_ _ = False
 
 instance Truthy Double where
-  if_ 0 = if_ False
-  if_ _ = if_ True
   not_ 0 = True
   not_ _ = False
 
 instance Truthy Integer where
-  if_ 0 = if_ False
-  if_ _ = if_ True
   not_ 0 = True
   not_ _ = False
 
 instance Truthy [a] where
-  if_ [] = if_ False
-  if_ _ = if_ True
   not_ [] = True
   not_ _ = False
 
 instance Truthy (Maybe a) where
-  if_ Nothing = if_ False
-  if_ _ = if_ True
   not_ Nothing = True
   not_ _ = False
 
 -- Maybe should be false for all none printable characters?
 instance Truthy Char where
-  if_ c
-    | ((ord c) < 32) || ((ord c) == 127) = if_ False
-    | otherwise = if_ True
   not_ c
     | ((ord c) < 32) || ((ord c) == 127) = True
     | otherwise = False
@@ -80,11 +62,14 @@ then_ = id
 else_ :: a -> a
 else_ = id
 
-ifnot_ :: (Truthy a) => a -> (x -> b) -> x -> (y -> b) -> y -> b
-ifnot_ = if_ . not_
-
 is_ :: (Truthy a) => a -> Bool
 is_ = not_ . not_
+
+if_ :: (Truthy a) => a -> (x -> b) -> x -> (y -> b) -> y -> b
+if_ t f x g y = if (is_ t) then f x else g y
+
+ifnot_ :: (Truthy a) => a -> (x -> b) -> x -> (y -> b) -> y -> b
+ifnot_ = if_ . not_
 
 and_ :: (Truthy a) => a -> a -> Bool
 and_ x y = (&&) (is_ x) (is_ y)
